@@ -19,7 +19,7 @@
         "reveal": "silent"
       },
       "options": {
-        "cwd": "src"
+        "cwd": "${workspaceFolder}"
       },
       "problemMatcher": "$msCompile"
     }
