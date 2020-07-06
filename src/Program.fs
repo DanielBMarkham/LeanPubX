@@ -1,27 +1,27 @@
-﻿// Learn more about F# at http://fsharp.org
-
-open System
+﻿open System
 open Markdig
 
 let pipelineBuilder = new MarkdownPipelineBuilder()
 let pipeline = (pipelineBuilder.UseAdvancedExtensions()).Build()
 let booksFileName = "Book.txt"
 let directorySeparator = string System.IO.Path.DirectorySeparatorChar
-let homeDirectory =
+let sourceDirectory =
   try System.Environment.GetCommandLineArgs().[1] + string directorySeparator with |_->System.Environment.CurrentDirectory
+let targetDirectory =
+  try System.Environment.GetCommandLineArgs().[2] + string directorySeparator with |_->System.Environment.CurrentDirectory
 
 let inputStuff (argv:string []) =
   let filesToWork =
     try
-      System.IO.File.ReadLines(homeDirectory + string System.IO.Path.DirectorySeparatorChar + booksFileName ) |> Seq.toArray
+      System.IO.File.ReadLines(sourceDirectory + string System.IO.Path.DirectorySeparatorChar + booksFileName ) |> Seq.toArray
     with |_-> Array.empty
-  printfn " Home Directory = %A" homeDirectory
+
   let filesToProcess =
     try
       filesToWork
         |> Array.map(fun filename->
           (
-            let fileItemName=homeDirectory + string System.IO.Path.DirectorySeparatorChar + filename
+            let fileItemName=sourceDirectory + string System.IO.Path.DirectorySeparatorChar + filename
             (
               System.IO.FileInfo(fileItemName)
               ,System.IO.File.ReadAllText(fileItemName)
@@ -32,23 +32,11 @@ let inputStuff (argv:string []) =
   filesToProcess  
 
 let processStuff dataIn  =
-(*  let ret =
-    dataIn |> Array.map(fun i x->
-      let fileInfo:System.IO.FileInfo = fst x
-      let fileText = snd x
-      let fileMarkup = Markdown.ToHtml(fileText)
-      printfn "%A %s" i (fileInfo.FullName)
-      printfn ""
-      printfn "%s" fileMarkup
-      printfn ""
-      )*)
-
   dataIn |> Array.map(fun (x:(IO.FileInfo*string))->
     let fileName = (fst x).FullName
     let fileText = snd x
-    let resourcesDirectory = """file:///""" + homeDirectory + "resources" + directorySeparator
+    let resourcesDirectory = """file:///""" + sourceDirectory + "resources" + directorySeparator
     let markdownText=Markdown.ToHtml(fileText) 
-    //markdownText.Replace("<img src=\"images/\"", "<img src=\"resources/images/\"")
     markdownText
       .Replace("<img src=\"images/", "<img src=\"" + resourcesDirectory + "images" + directorySeparator)
     )
@@ -79,7 +67,7 @@ let outputStuff (processedDatata:string []) =
     """
 
   let totalFile = pagePrefix + (String.concat "\n" (processedDatata |> Array.toSeq)) + pageSuffix
-  System.IO.File.WriteAllText("foo.html", totalFile)
+  System.IO.File.WriteAllText(sourceDirectory + string System.IO.Path.DirectorySeparatorChar + "foo.html", totalFile)
   0
 
 
