@@ -2,7 +2,7 @@
   "profiles": {
     "src": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\Daniel_Main\\Dropbox\\writing\\info-ops-books\\Info-Ops2\\manuscript"
+      "commandLineArgs": "C:\\Users\\Daniel_Main\\Dropbox\\writing\\info-ops-books\\Info-Ops2\\manuscript C:\\Users\\Daniel_Main\\Dropbox"
     }
   }
 }
